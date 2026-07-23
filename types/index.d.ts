@@ -5,9 +5,37 @@ interface Resume {
     imagePath: string;
     resumePath: string;
     feedback: Feedback;
+    deterministicATS?: DeterministicATSResult;
+}
+
+interface KeywordMatchResult {
+    score: number;
+    matchedKeywords: string[];
+    missingKeywords: string[];
+}
+
+interface StructureCheckResult {
+    score: number;
+    wordCount: number;
+    hasEmail: boolean;
+    hasPhone: boolean;
+    foundSections: string[];
+    missingSections: string[];
+}
+
+interface DeterministicATSResult {
+    overallScore: number;
+    keywordMatch: KeywordMatchResult;
+    structure: StructureCheckResult;
+}
+
+interface NotResumeResponse {
+    isResume: false;
+    message: string;
 }
 
 interface Feedback {
+    isResume: true;
     overallScore: number;
     ATS: {
         score: number;

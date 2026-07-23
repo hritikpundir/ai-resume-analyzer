@@ -83,3 +83,34 @@ export async function convertPdfToImage(
         };
     }
 }
+
+
+export async function extractPdfText(file: File): Promise<string> {
+    try {
+        const lib = await loadPdfJs();
+
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await lib.getDocument({ data: arrayBuffer }).promise;
+
+        let fullText = "";
+
+        // Loop through every page, not just page 1 (resumes can be multi-page)
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            const page = await pdf.getPage(pageNum);
+            const textContent = await page.getTextContent();
+
+            // textContent.items is a list of small text fragments with position info.
+            // We only care about the actual text, so we pull out `.str` from each one.
+            const pageText = textContent.items
+                .map((item: any) => item.str)
+                .join(" ");
+
+            fullText += pageText + "\n";
+        }
+
+        return fullText.trim();
+    } catch (err) {
+        console.error("PDF TEXT EXTRACTION ERROR:", err);
+        return "";
+    }
+}
